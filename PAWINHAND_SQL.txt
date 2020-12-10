@@ -1,0 +1,502 @@
+
+create table shelter(
+num number CONSTRAINT shelter_num_pk PRIMARY KEY,
+regDate date,
+hit number,
+animal varchar2(100),
+animal_kind varchar2(100),
+sex varchar2(100),
+neuter varchar2(100),
+color varchar2(100),
+birth varchar2(100),
+kg varchar2(100),
+period_1 date,
+period_2 date,
+place_of_find varchar2(1000),
+special varchar2(1000),
+center varchar2(300), 
+center_tel varchar2(100),
+center_Address varchar2(1000),
+id VARCHAR2(100) REFERENCES member(id) on delete CASCADE
+);
+
+
+create table shelterFile(
+    fileNum number CONSTRAINT shelterFile_filenum_pk PRIMARY KEY,
+    num number CONSTRAINT shelterFile_num_fk REFERENCES shelter (num) on delete cascade,
+    filename varchar2(400) NOT NULL, 
+    oriName varchar2(400) NOT NULL 
+);
+
+
+create table lost(
+    num number primary key,
+    state varchar2(200),
+    lostDate Date,
+    lostProvince varchar2(200),
+    lostCity varchar2(200),
+    lostLocation varchar2(200),
+    phone varchar2(200),
+    animalSpecies varchar2(200),
+    detailSpecies varchar2(200),
+    gender varchar2(200),
+    age varchar2(200),
+    color varchar2(200),
+    feature varchar2(200),
+    contents varchar2(4000),
+    id varchar2(200)
+);
+
+
+
+create table lostreply(
+    num number primary key,
+    lostnum number CONSTRAINT LOSTREPLY_LOSTNUM_FK REFERENCES lost(num) on delete cascade,
+    id varchar2(200),
+    contents varchar2(4000),
+    regDate date,
+    ref number,
+    step number,
+    depth number
+);
+
+
+create table lostfile(
+    num number CONSTRAINT LOSTFILE_LOSTNUM_FK REFERENCES lost(num) on delete cascade,
+    filename varchar2(2000),
+    oriname varchar(2000)
+);
+
+
+
+create table board(
+   num number primary key,
+   title varchar2(200),
+   writer varchar2(200),
+   contents varchar2(4000),
+   regdate date,
+   hit number
+);
+
+
+
+create table qna(
+   num number primary key,
+   title varchar2(200),
+   writer varchar2(200),
+   contents varchar2(4000),
+   regdate date,
+   hit number,
+   ref   NUMBER,
+   step   NUMBER,
+   depth NUMBER
+);
+
+
+create table boardfile(
+    num   NUMBER,
+    filename VARCHAR2(400),
+    oriname   VARCHAR2(400)
+);
+
+
+create table qnafile(
+    fileNum NUMBER primary key,
+    num   NUMBER,
+    filename VARCHAR2(400),
+    oriname   VARCHAR2(400)
+);
+
+
+create table voluntaryBoard(
+    num number primary key,
+    title varchar2(400),
+    writer varchar2(400),
+    contents varchar2(3000),
+    regDate date,
+    hit number
+);
+
+
+create table volBoardFile(
+    fileNum number primary key,
+    num number constraint fn_fk references voluntaryBoard(num),
+    fileName varchar2(500),
+    oriName varchar2(500)
+);
+
+
+
+create table reserveVoluntary(
+    resNum number primary key,
+    num number constraint rv_fk references voluntaryboard(num), //외래키
+    resDate varchar2(300),
+    startTime varchar2(300),
+    endTime varchar2(300),
+    id varchar2(300) -- 아이디는 멤버테이블의 아이디 외래키로 받아야됨
+);
+
+
+
+create table cart(
+id varchar2(100) CONSTRAINT cart_id_fk REFERENCES member (id) on delete cascade,
+cartNum number CONSTRAINT cart_CN_pk PRIMARY KEY,
+product_num number CONSTRAINT cart_PN_fk REFERENCES product (product_num) on delete cascade,
+amount number,
+totalPrice number
+);
+
+
+create table member(
+    id VARCHAR2(100) primary key,
+    pw VARCHAR2(100),
+    name VARCHAR2(100),
+    email VARCHAR2(100),
+    phone VARCHAR2(100),
+    points number,
+    zipcode varchar2(50),
+    address VARCHAR2(500),
+    detailAddress VARCHAR2(500),
+    extraAddress VARCHAR2(500),
+    member_type number
+);
+
+
+
+create table product(
+   product_num number constraint PD_PN_PK primary key,
+   category_num number constraint PD_CN_FK references category(num) on delete cascade,
+   name VARCHAR2(40),   
+   price number,
+   stock number,
+   weight VARCHAR2(20),   
+   color VARCHAR2(50),     
+   descriptions VARCHAR2(2000),
+   regDate Date
+);
+
+
+create table category(
+    num number primary key,
+    categoryName varchar2(100)
+);
+
+
+create table storeFile(
+    file_num number primary key,
+    product_num number references product(product_num) 
+        on delete cascade,
+    fileName varchar2(300),
+    oriName varchar2(300)
+);
+
+create table productReview(
+    review_num number primary key,
+    product_num number REFERENCES product(product_num) on delete CASCADE,
+    id VARCHAR2(100) REFERENCES member(id) on delete CASCADE,
+    starcount number,
+    contents varchar2(2000)
+);
+
+create table ReviewFile(
+    reviewfile_num number primary key,
+    review_num number REFERENCES productreview(review_num) on delete CASCADE,
+    fileName varchar(200),
+    oriName varchar(200)
+);
+
+create table productQna(
+  qna_num number primary key,
+  product_num number REFERENCES product(product_num) on delete cascade,
+  id varchar2(200) references member(id) on delete cascade,
+  contents varchar2(2000),
+  title varchar2(200),
+  regDate Date
+);
+
+create table productQnaReply(
+  qnaReply_num number primary key,
+  qna_num number REFERENCES productQna(qna_num) on delete cascade,
+  id varchar2(200) references member(id) on delete cascade,
+  contents varchar2(2000),
+  regDate Date
+);
+
+
+create table productDetail(
+  productDetail_num number primary key,
+  product_num number REFERENCES product(product_num) on delete cascade,
+  fileName varchar2(200),
+  oriName varchar2(200),
+  id varchar2(200) references member(id) on delete cascade
+);
+
+
+
+create table orderList(
+ order_num number primary key,
+  orderId varchar2(100) references member(id) on delete cascade,
+  toName varchar2(100),
+  toAddress varchar(200),
+  toZipcode number,
+  toPhone varchar(200),
+  toTel varchar2(200), 
+  regDate date,
+  total number,
+  addComment varchar2(500)
+);
+
+//주문서 작성할 때 넘어오는 주문상품상세 테이블
+create table orderDetail(
+    num number primary key,
+    id VARCHAR2(100) references member(id),
+    order_num number references orderList(order_num),
+    product_num number references product(product_num),
+    name varchar2(40),
+    amount number,
+    ptotal number
+);
+
+
+
+//결제정보 테이블
+create table payInfo(
+ order_num number references orderList(order_num),
+ id varchar2(100) references member(id),
+ payMethod varchar2(100),
+ totalPrice number,
+ isPay number,
+ payDate Date,
+ endDate Date
+);
+
+create table depositInfo(
+    order_num number references orderList(order_num),
+    depositName varchar2(100),
+    depositAccount varchar2(300)
+);
+
+
+create table community(
+    num number CONSTRAINT CM_NUM_PK primary key,
+    type varchar2(200) default '기타' ,
+    title varchar2(200),
+    writer varchar2(200),
+    contents varchar2(4000),
+    regDate date,
+    hit number
+);
+
+create table communityFile(
+    fileNum number constraint CF_NUM_PK primary key,
+    num number constraint CF_id_fk references community(num),
+    fileName varchar2(500),
+    oriName VARCHAR2(500)
+);
+
+
+create table communityreply(
+    num number primary key,
+    cmn_num number CONSTRAINT CMR_CMN_FK REFERENCES community(num) on delete cascade,
+    writer varchar2(200),
+    contents varchar2(4000),
+    regDate date,
+    ref number,
+    step number,
+    depth number
+);
+
+
+
+
+
+create sequence SHELTER_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache
+
+
+
+create sequence productreview_seq
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
+create sequence reviewfile_seq
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
+create sequence product_seq
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
+create sequence productQna_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+create sequence productQnaReply_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+
+
+create sequence productDetail_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+
+
+create sequence ol_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocache;
+
+create sequence od_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocache;
+
+
+
+
+
+
+create sequence cm_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+
+create sequence cr_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+create sequence SHELTER_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache
+
+
+
+
+create sequence lost_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+
+create sequence lostreply_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+
+
+create sequence notice
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+
+create sequence qna_seq
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+
+
+
+
+create sequence RV_SEQ
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
+
+create sequence VOL_SEQ
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
+
+create sequence BFD_SEQ
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
+create sequence cart_seq
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
+create sequence storefile_seq
+start with 1
+INCREMENT by 1
+NOMAXVALUE
+NOMINVALUE
+nocache;
+
